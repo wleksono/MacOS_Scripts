@@ -7,20 +7,16 @@
 
 #Variables
 # Insert desired macOS minimum version for script to run. example is 14 for macOS 14 Sonoma and later.
-desiredmacOSVersion=11 
+desiredmacOSVersion=14
 
-# Insert the output of the screenSaverBase64 variable from the 'Get Screen Saver and Wallpaper Settings' script.
+# This is the base64 value of the Photo Screen Saver (iLifeSlideshows.appex) in MacOS 14 Sonoma.
 screenSaverBase64='YnBsaXN0MDDRAQJWbW9kdWxl0QMEWHJlbGF0aXZlXxBEZmlsZTovLy9TeXN0ZW0vTGlicmFyeS9FeHRlbnNpb25LaXQvRXh0ZW5zaW9ucy9pTGlmZVNsaWRlc2hvd3MuYXBwZXgICxIVHgAAAAAAAAEBAAAAAAAAAAUAAAAAAAAAAAAAAAAAAABl'
 
 #Set local path of slideshow images 
 photoloc="/Users/Shared/SSaver" 
 
 #Main
-scr_paths=(
-    "/System/Library/Frameworks/ScreenSaver.framework/Resources/iLifeSlideshows.saver" #OSX 10-11
-    "/System/Library/Frameworks/ScreenSaver.framework/PlugIns/iLifeSlideshows.appex" #OSX 12-13
-    "/System/Library/ExtensionKit/Extensions/iLifeSlideshows.appex" #OSX14+
-)
+scr_path="/System/Library/ExtensionKit/Extensions/iLifeSlideshows.appex" #OSX14+
 
 # Function to apply screensaver settings
 apply_screensaver_settings() {
@@ -52,18 +48,6 @@ do_we_need_to_run(){
 		echo "Already configured. No need to run."
 		exit 0
 	fi
-}
-
-# Function to set iLifeSlideshows module if available
-set_module_if_exists() {
-    local user=$1
-    for scr_path in "${scr_paths[@]}"; do
-        if [ -d "$scr_path" ]; then
-            #echo "$scr_path exists."
-            sudo -u "$user" defaults -currentHost write com.apple.screensaver moduleDict -dict moduleName -string "iLifeSlideshows" path -string "$scr_path" type -int 0
-            break
-        fi
-    done
 }
 
 current_user=$(stat -f "%Su" /dev/console)
@@ -228,7 +212,6 @@ getStarterVariables
 
 # Apply new SS config
 apply_screensaver_settings "$current_user"
-set_module_if_exists "$current_user"
 
 # Refresh preferences daemon
 killall -hup cfprefsd
