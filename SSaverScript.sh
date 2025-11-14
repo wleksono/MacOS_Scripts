@@ -21,7 +21,7 @@ scr_path="/System/Library/ExtensionKit/Extensions/iLifeSlideshows.appex" #OSX14+
 # Function to apply screensaver settings
 apply_screensaver_settings() {
     local Cuser=$1
-    sudo -u "$Cuser" defaults -currentHost write com.apple.ScreenSaverPhotoChooser CustomFolderDict -dict identifier "$photoloc" name "SSSaver"
+    sudo -u "$Cuser" defaults -currentHost write com.apple.ScreenSaverPhotoChooser CustomFolderDict -dict identifier "$photoloc" name "SSaver"
     sudo -u "$Cuser" defaults -currentHost write com.apple.ScreenSaverPhotoChooser SelectedFolderPath "$photoloc"
     sudo -u "$Cuser" defaults -currentHost write com.apple.ScreenSaverPhotoChooser SelectedSource -int 4
     sudo -u "$Cuser" defaults -currentHost write com.apple.ScreenSaverPhotoChooser ShufflesPhotos -bool false
@@ -109,6 +109,7 @@ function checkUser() {
 		exitCode='1'
 		finalize
 	else
+		apply_screensaver_settings "$current_user"
 		setScreenSaverSettings
 	fi
 }
@@ -209,9 +210,6 @@ killall "System Settings"
 
 echo ""
 getStarterVariables
-
-# Apply new SS config
-apply_screensaver_settings "$current_user"
 
 # Refresh preferences daemon
 killall -hup cfprefsd
